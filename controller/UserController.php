@@ -28,7 +28,7 @@ class UserController
         $servername = "localhost";
         $username = "root";
         $password = "";
-        $dbname = "cinema";
+        $dbname = "dam1m05uf3p1";
 
         // create connection
         $this->conn = new mysqli($servername, $username, $password, $dbname);
