@@ -1,5 +1,6 @@
 <?php
 session_start();
+
 // check if form is submitted
 $user = new UserController();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -58,7 +59,7 @@ class UserController
             $_SESSION["user"]=$username;
             $this->conn->close();
             // redirect to home page
-            header("Location: /../view/profile.php");
+            header("Location: ../view/profile.php");
             exit();
         } else {
             // authentication failed, display an error message
@@ -66,7 +67,7 @@ class UserController
             $_SESSION['error'] = "Invalid username or password.";
             $this->conn->close();
             // redirect to login
-            header("Location: /../view/login.php");
+            header("Location: ../view/login.php");
         }
     }
     
@@ -98,7 +99,7 @@ class UserController
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {             
             $_SESSION['error'] = "Invalid email format";
             // redirect to register page
-            header("Location: /../view/register.php");
+            header("Location: ../view/register.php");
             exit();
         }
         
@@ -111,7 +112,7 @@ class UserController
         $_SESSION["logged"]=true;
         $_SESSION["user"]=$username;
         // redirect to register page
-        header("Location: /../view/home.php");
+        header("Location: ../view/home.php");
         exit();
     }
 }
