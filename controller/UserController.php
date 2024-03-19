@@ -51,26 +51,26 @@ class UserController
         // check against a database
         $stmt = $this->conn->prepare("SELECT name, password FROM users  WHERE name=? AND password=?");
         $stmt->bind_param("ss", $username, $password);
-        $stmt->execute();        
+        $stmt->execute();
 
         if ($stmt->fetch()) {
             // authentication successful
-            $_SESSION["logged"]=true;
-            $_SESSION["user"]=$username;
+            $_SESSION["logged"] = true;
+            $_SESSION["user"] = $username;
             $this->conn->close();
             // redirect to home page
             header("Location: ../view/profile.php");
             exit();
         } else {
             // authentication failed, display an error message
-            $_SESSION["logged"]=false;
+            $_SESSION["logged"] = false;
             $_SESSION['error'] = "Invalid username or password.";
             $this->conn->close();
             // redirect to login
             header("Location: ../view/login.php");
         }
     }
-    
+
     /**
      * logout user from application
      */
@@ -84,7 +84,7 @@ class UserController
         // redirect to index page
         header("Location: ../view/index.php");
     }
-    
+
     /**
      * register user to application
      */
@@ -94,25 +94,89 @@ class UserController
         $username = $_POST["username"];
         $password = $_POST["password"];
         $email = $_POST["email"];
-        
+        $nameImage = $_FILES['image']['name'];
+        $typeImage = $_FILES['image']['type'];
+        $sizeImage = $_FILES['image']['size'];
+        // check image exist and size
+        if (!empty($nameImage) && ($sizeImage <= 2000000)) {
+            //check format
+            if (($typeImage == "image/jpeg")
+                || ($typeImage == "image/jpg")
+                || ($typeImage == "image/png")
+            ) {
+                // path to save images
+                $target_dir = "../view/img/";
+                // define folder + name of file
+                $target_file = $target_dir . basename($nameImage);
+                // move image from temporal folder to image server folder
+                if (move_uploaded_file($_FILES['image']['tmp_name'], $target_file)) {
+                    echo "uploading";
+                } else {
+                    //in case any error moving to server
+                    $_SESSION['error'] = "Error uploading";
+                    $_SESSION['error'] = $target_file;
+                    // redirect to register page
+                    header("Location: ../view/register.php");
+                }
+                
+            } else {
+                //in case any error in format image
+                $_SESSION['error'] = "Invalid image format";
+                // redirect to register page
+                header("Location: ../view/register.php");
+            }
+        } else {
+            //in case error in size image
+            if ($nameImage == !NULL) {
+                $_SESSION['error'] = "Invalid image size";
+                // redirect to register page
+                header("Location: ../view/register.php");
+                exit();
+            }
+        }       
+
         // validate data form
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {             
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
             $_SESSION['error'] = "Invalid email format";
             // redirect to register page
             header("Location: ../view/register.php");
             exit();
         }
-        
+
         // insert to database
-        $stmt = $this->conn->prepare("INSERT INTO Users (name, password, email) VALUES (?, ?, ?)");
-        $stmt->bind_param("sss", $username, $password, $email);
-        $stmt->execute();
-        $this->conn->close();
-        // authentication successful
-        $_SESSION["logged"]=true;
-        $_SESSION["user"]=$username;
-        // redirect to register page
-        header("Location: ../view/home.php");
-        exit();
+        $stmt = $this->conn->prepare("INSERT INTO Users (name, password, email, path_img) VALUES (?, ?, ?, ?)");
+        $stmt->bind_param("ssss", $username, $password, $email, $nameImage);
+        
+        try {
+            //code...
+            if ($stmt->execute()) {
+                echo "New record created successfully";
+                // register successful
+                $_SESSION["logged"] = true;
+                $_SESSION["user"] = $username;
+                $_SESSION["image"] = $nameImage;
+                $this->conn->close();
+                // redirect to home page
+                header("Location: ../view/home.php");
+                exit();
+            } else {
+                $_SESSION['error'] = "Invalid register";
+                $this->conn->close();
+                // redirect to register page
+                header("Location: ../view/register.php");
+            }
+
+        } catch (\Exception $e) {
+            $_SESSION['error'] = $e->getMessage();
+            $this->conn->close();
+            // redirect to register page
+            header("Location: ../view/register.php");
+            //throw $th;
+
+        } finally {
+            // Close connection
+            $this->conn->close();
+        }
     }
 }
+
