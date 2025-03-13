@@ -2,8 +2,8 @@
 session_start();
 
 // check if form is submitted
-$user = new UserController();
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $user = new UserController();
     // check button
     if (isset($_POST["login"])) {
         echo "<p>Login button is clicked.</p>";
