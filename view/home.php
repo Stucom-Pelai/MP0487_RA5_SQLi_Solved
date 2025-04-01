@@ -47,15 +47,14 @@
     </header>
     <?php
     if (isset($_SESSION["logged"])) {
-        if ($_SESSION["logged"]) {
-            // get image from server
-            $image =  $_SESSION["image"];
-            echo("<section><center><img style='width: 150px;' src='img\\$image' alt='profile image'></center>" ); ?>            
-                <h2>My Profile</h2><h3>this is your profile.</h3>
-                <form action="../controller/UserController.php" method="post"> 
-                    <br>                   
-                    <button type="submit" name="logout">Logout</button>
-                </form>
+        if ($_SESSION["logged"]) {           
+            echo ("<section>");?>
+            <h2>My Home page</h2>
+            <h3>this is your web.</h3>
+            <form action="../controller/UserController.php" method="post">
+                <br>
+                <button type="submit" name="logout">Logout</button>
+            </form>
             </section>;
 
     <?php    }

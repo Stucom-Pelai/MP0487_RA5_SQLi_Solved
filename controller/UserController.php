@@ -22,7 +22,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 class UserController
 {
     private $conn;
-
+    
     public function __construct()
     {
         // database connection
@@ -46,18 +46,25 @@ class UserController
      */
     public function login(): void
     {
+        // get data from Form request
         $username = $_POST["username"];
         $password = $_POST["password"];
+
         // check against a database
-        $stmt = $this->conn->prepare("SELECT name, password FROM users  WHERE name=? AND password=?");
+        $stmt = $this->conn->prepare("SELECT name, email FROM users  WHERE name=? AND password=?");
         $stmt->bind_param("ss", $username, $password);
         $stmt->execute();
+        $result = $stmt->get_result();
 
-        if ($stmt->fetch()) {
-            // authentication successful
+        if ($row = $result->fetch_assoc()) {            
+            // Autenticación exitosa
             $_SESSION["logged"] = true;
-            $_SESSION["user"] = $username;
+            $_SESSION["user"] = $row["name"];
+            $_SESSION["email"] = $row["email"];
+
+            // close connection
             $this->conn->close();
+
             // redirect to home page
             header("Location: ../view/profile.php");
             exit();
@@ -65,7 +72,10 @@ class UserController
             // authentication failed, display an error message
             $_SESSION["logged"] = false;
             $_SESSION['error'] = "Invalid username or password.";
+
+            // close connection
             $this->conn->close();
+            
             // redirect to login
             header("Location: ../view/login.php");
         }

@@ -1,3 +1,14 @@
+<?php
+session_start();
+
+// Verificar si el usuario ha iniciado sesión
+if (isset($_SESSION["logged"]) && $_SESSION["logged"] == true) {
+    //get data from session
+    $username = htmlspecialchars($_SESSION["user"]);
+    $email = htmlspecialchars($_SESSION["email"] ?? "No email available");
+}
+
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -55,10 +66,8 @@
 
     <section class="profile-container">
         <img src="../view/img/profile-picture.png" alt="User Profile Picture">
-        <h2>John Doe</h2>
-        <p>Email: john.doe@example.com</p>
-        <p>Location: City, Country</p>
-        <p>Joined: January 1, 2023</p>
+        <h2><?php echo $username; ?></h2>
+        <p>Email: <?php echo $email; ?></p>
         <!-- Add more profile details as needed -->
     </section>
 
